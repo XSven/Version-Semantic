@@ -1,0 +1,40 @@
+=pod
+
+=head1 NAME
+
+Version::Semantic - ...
+
+=head1 SEE ALSO
+
+=over 2
+
+=item *
+
+L<Semantic Versioning 2.0.0|https://semver.org/spec/v2.0.0.html>
+
+=item *
+
+L<SemVer::V2::Strict>
+
+=item *
+
+L<SemVer>
+
+=item *
+
+L<Version::Dotted::Semantic>
+
+=back
+
+=head1 AUTHOR
+
+Sven Willenbuecher <sven.willenbuecher@gmx.de>
+
+=head1 COPYRIGHT AND LICENSE
+
+This software is copyright (c) 2025 by Sven Willenbuecher.
+
+This is free software; you can redistribute it and/or modify it under the
+same terms as the Perl 5 programming language system itself.
+
+=cut
