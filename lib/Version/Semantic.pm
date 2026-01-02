@@ -48,22 +48,52 @@ sub parse {
 sub compare_to {
   my ( $self, $other ) = @_;
 
-  return $self->major <=> $other->major if $self->major != $other->major;
-  return $self->minor <=> $other->minor if $self->minor != $other->minor;
-  return $self->patch <=> $other->patch if $self->patch != $other->patch;
+  for ( qw( major minor patch ) ) {
+    return $self->$_ <=> $other->$_ if $self->$_ != $other->$_
+  }
   $self->_compare_pre_release( $other )
 }
 
-# TODO: Implement pre_release comparison
 sub _compare_pre_release {
   my ( $self, $other ) = @_;
 
-  my $a_pre_release = $self->pre_release;
-  my $b_pre_release = $other->pre_release;
+  my @a = defined $self->pre_release  ? split /\./, $self->pre_release  : ();
+  my @b = defined $other->pre_release ? split /\./, $other->pre_release : ();
 
-  return -1 if defined $a_pre_release     and not defined $b_pre_release;
-  return 1  if not defined $a_pre_release and defined $b_pre_release;
+  # 11.3
+  if ( @a ) {
+    return -1 if not @b
+  } else {
+    return 1 if @b
+  }
 
+  # 11.4
+  my $len = @a < @b ? @a : @b;
+  for ( my $i = 0 ; $i < $len ; $i++ ) {
+    my $ai = $a[ $i ];
+    my $bi = $b[ $i ];
+
+    my $a_num = $ai =~ m/\A (?: 0 | [1-9]\d* ) \z/x;
+    my $b_num = $bi =~ m/\A (?: 0 | [1-9]\d* ) \z/x;
+
+    # 11.4.1
+    if ( $a_num and $b_num ) {
+      my $cmp = $ai <=> $bi;
+      return $cmp if $cmp != 0
+      # 11.4.3
+    } elsif ( $a_num and not $b_num ) {
+      return -1
+      # 11.4.3
+    } elsif ( not $a_num and $b_num ) {
+      return 1
+    } else {
+      my $cmp = $ai cmp $bi;
+      return $cmp if $cmp != 0
+    }
+  }
+
+  # 11.4.4
+  @a <=> @b
 }
 
 sub _croakf ( $@ ) {
