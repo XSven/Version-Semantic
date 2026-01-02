@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 3;
+use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 5;
 use Test::Fatal qw( exception );
 my $class;
 
@@ -13,20 +13,41 @@ BEGIN {
 like exception { $class->parse( '1.0.0-alpha_beta' ) }, qr/is not a semantic version/, 'Invalid semantic version';
 
 subtest 'Test named capture group accessors' => sub {
-  plan tests => 12;
+  plan tests => 6;
 
   isa_ok my $self = $class->parse( '1.2.3-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay' ), $class;
   is $self->major,       1,                           'major';
   is $self->minor,       2,                           'minor';
   is $self->patch,       3,                           'patch';
   is $self->pre_release, 'alpha-a.b-c-somethinglong', 'pre_release';
-  is $self->build,       'build.1-aef.1-its-okay',    'build';
+  is $self->build,       'build.1-aef.1-its-okay',    'build'
+};
 
-  # Use a "v" prefixed semantic version
-  isa_ok $self = $class->parse( 'v0.0.4' ), $class;
+subtest 'Test named capture group accessors: "v" prefixed semantic version' => sub {
+  plan tests => 6;
+
+  isa_ok my $self = $class->parse( 'v0.0.4' ), $class;
   is $self->major, 0, 'major';
   is $self->minor, 0, 'minor';
   is $self->patch, 4, 'patch';
   ok not( defined $self->pre_release ), 'pre_release is not defined'; ## no critic ( RequireTestLabels )
   ok not( defined $self->build ), 'build is not defined' ## no critic ( RequireTestLabels )
+};
+
+subtest 'Test named capture group accessors: "-TRIAL\d*" pre-releases' => sub {
+  plan tests => 20;
+
+  my $expected_pre_release = 'TRIAL';
+  isa_ok my $self = $class->parse( "1.0.5-$expected_pre_release" ), $class;
+  is $self->major,       1,                     'major';
+  is $self->minor,       0,                     'minor';
+  is $self->patch,       5,                     'patch';
+  is $self->pre_release, $expected_pre_release, "pre_release: $expected_pre_release";
+  ok not( defined $self->build ), 'build is not defined'; ## no critic ( RequireTestLabels )
+
+  for ( 0 .. 13 ) {
+    $expected_pre_release = "TRIAL$_";
+    $self                 = $class->parse( "1.2.3-$expected_pre_release" );
+    is $self->pre_release, $expected_pre_release, "pre_release: $expected_pre_release"
+  }
 }
