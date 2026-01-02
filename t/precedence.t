@@ -19,10 +19,8 @@ subtest '11.2' => sub {
 };
 
 subtest '11.3' => sub {
-  plan tests => 1;
+  plan tests => 2;
 
-TODO: {
-    local $TODO = 'pre_release comparison not implemented yet';
-    ok $class->parse( '1.0.0-alpha' ) < $class->parse( '1.0.0' ), '1.0.0-alpha < 1.0.0'
-  }
+  ok $class->parse( '1.0.0-alpha' ) < $class->parse( '1.0.0' ), '1.0.0-alpha < 1.0.0';
+  ok $class->parse( '1.0.0' ) > $class->parse( '1.0.0-alpha' ), '1.0.0 > 1.0.0-alpha'
 }

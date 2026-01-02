@@ -50,9 +50,20 @@ sub compare_to {
 
   return $self->major <=> $other->major if $self->major != $other->major;
   return $self->minor <=> $other->minor if $self->minor != $other->minor;
-  return $self->patch <=> $other->patch if $self->patch != $other->patch
-  # TODO: Implement pre_release comparison
-  #return _compare_pre_release($self->pre_release, $other->pre_release);
+  return $self->patch <=> $other->patch if $self->patch != $other->patch;
+  $self->_compare_pre_release( $other )
+}
+
+# TODO: Implement pre_release comparison
+sub _compare_pre_release {
+  my ( $self, $other ) = @_;
+
+  my $a_pre_release = $self->pre_release;
+  my $b_pre_release = $other->pre_release;
+
+  return -1 if defined $a_pre_release     and not defined $b_pre_release;
+  return 1  if not defined $a_pre_release and defined $b_pre_release;
+
 }
 
 sub _croakf ( $@ ) {
