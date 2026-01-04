@@ -78,8 +78,8 @@ sub _compare_pre_release {
 
     # 11.4.1
     if ( $a_num and $b_num ) {
-      my $cmp = $ai <=> $bi;
-      return $cmp if $cmp != 0
+      my $sign = $ai <=> $bi;
+      return $sign if $sign != 0
       # 11.4.3
     } elsif ( $a_num and not $b_num ) {
       return -1
@@ -87,8 +87,8 @@ sub _compare_pre_release {
     } elsif ( not $a_num and $b_num ) {
       return 1
     } else {
-      my $cmp = $ai cmp $bi;
-      return $cmp if $cmp != 0
+      my $sign = $ai cmp $bi;
+      return $sign if $sign != 0
     }
   }
 

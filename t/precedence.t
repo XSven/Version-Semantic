@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT ok plan require_ok subtest ) ], tests => 4;
+use Test::More import => [ qw( BAIL_OUT cmp_ok ok plan require_ok subtest ) ], tests => 4;
 my $class;
 
 BEGIN {
@@ -26,13 +26,15 @@ subtest '11.2' => sub {
 subtest '11.3' => sub {
   plan tests => 3;
 
-  ok $class->parse( '1.0.0-alpha' ) < $class->parse( '1.0.0' ), '1.0.0-alpha < 1.0.0';
-  ok $class->parse( '1.0.0' ) == $class->parse( '1.0.0' ),      '1.0.0 == 1.0.0';
-  ok $class->parse( '1.0.0' ) > $class->parse( '1.0.0-alpha' ), '1.0.0 > 1.0.0-alpha'
+  my @tests = ( [ '1.0.0-alpha', '<', '1.0.0' ], [ '1.0.0', '==', '1.0.0' ], [ '1.0.0', '>', '1.0.0-alpha' ] );
+  for ( @tests ) {
+    my ( $l, $o, $r ) = @$_;
+    cmp_ok $class->parse( $l ), $o, $class->parse( $r ), "$l $o $r"
+  }
 };
 
 subtest '11.4' => sub {
-  plan tests => 15;
+  plan tests => 17;
 
   my @versions = qw(
     0.9.0
@@ -55,6 +57,8 @@ subtest '11.4' => sub {
   for ( my $i = 0 ; $i < $#versions ; ++$i ) {
     ok $class->parse( $versions[ $i ] ) < $class->parse( $versions[ $i + 1 ] ), "$versions[ $i ] < $versions[ $i + 1 ]"
   }
+  ok $class->parse( '1.0.0-alpha.beta' ) > $class->parse( '1.0.0-alpha.1' ), '1.0.0-alpha.beta > 1.0.0-alpha.1';
   ok $class->parse( '1.0.0-alpha' ) == $class->parse( '1.0.0-alpha' ),
-    '1.0.0-alpha == 1.0.0-alpha (same pre-release lists)'
+    '1.0.0-alpha == 1.0.0-alpha (same pre-release lists)';
+  ok $class->parse( '1.0.0-5' ) == $class->parse( '1.0.0-5' ), '1.0.0-5 == 1.0.0-5 (same pre-release lists)'
 }

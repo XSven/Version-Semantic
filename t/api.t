@@ -11,4 +11,4 @@ BEGIN {
   require_ok $class or BAIL_OUT "Cannot load class '$class'!"
 }
 
-public_ok $class, qw( parse major minor patch pre_release build compare_to );
+public_ok $class, qw( parse major minor patch pre_release build compare_to )
