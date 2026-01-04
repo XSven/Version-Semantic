@@ -64,7 +64,7 @@ sub _compare_pre_release {
   if ( @a ) {
     return -1 if not @b
   } else {
-    return 1 if @b
+    return ( @b ? 1 : 0 )
   }
 
   # 11.4

@@ -24,10 +24,11 @@ subtest '11.2' => sub {
 };
 
 subtest '11.3' => sub {
-  plan tests => 2;
+  plan tests => 3;
 
   ok $class->parse( '1.0.0-alpha' ) < $class->parse( '1.0.0' ), '1.0.0-alpha < 1.0.0';
-  ok $class->parse( '1.0.0' ) > $class->parse( '1.0.0-alpha' ), '1.0.0 > 1.0.0-alpha';
+  ok $class->parse( '1.0.0' ) == $class->parse( '1.0.0' ),      '1.0.0 == 1.0.0';
+  ok $class->parse( '1.0.0' ) > $class->parse( '1.0.0-alpha' ), '1.0.0 > 1.0.0-alpha'
 };
 
 subtest '11.4' => sub {
