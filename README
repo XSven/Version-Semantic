@@ -1,6 +1,6 @@
 NAME
 
-Version::Semantic - ...
+Version::Semantic - Tiny SemVer based class implementation
 
 INSTALLATION
 
@@ -37,7 +37,7 @@ The "RELEASE_TESTING" flag enables the release testing context.
 
 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Sven Willenbuecher.
+This software is copyright (c) 2026 by Sven Willenbuecher.
 
 This is free software; you can redistribute it and/or modify it under the same
 terms as the Perl 5 programming language system itself.

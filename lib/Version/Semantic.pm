@@ -48,6 +48,7 @@ sub parse {
 sub compare_to {
   my ( $self, $other ) = @_;
 
+  # 11.2
   for ( qw( major minor patch ) ) {
     return $self->$_ <=> $other->$_ if $self->$_ != $other->$_
   }
@@ -57,6 +58,7 @@ sub compare_to {
 sub _compare_pre_release {
   my ( $self, $other ) = @_;
 
+  # Split pre-release into list of dot separated identifiers
   my @a = defined $self->pre_release  ? split /\./, $self->pre_release  : ();
   my @b = defined $other->pre_release ? split /\./, $other->pre_release : ();
 
@@ -73,18 +75,18 @@ sub _compare_pre_release {
     my $ai = $a[ $i ];
     my $bi = $b[ $i ];
 
-    my $a_num = $ai =~ m/\A (?: 0 | [1-9]\d* ) \z/x;
-    my $b_num = $bi =~ m/\A (?: 0 | [1-9]\d* ) \z/x;
+    my $ai_is_num = $ai =~ m/\A (?: 0 | [1-9]\d* ) \z/x;
+    my $bi_is_num = $bi =~ m/\A (?: 0 | [1-9]\d* ) \z/x;
 
     # 11.4.1
-    if ( $a_num and $b_num ) {
+    if ( $ai_is_num and $bi_is_num ) {
       my $sign = $ai <=> $bi;
       return $sign if $sign != 0
       # 11.4.3
-    } elsif ( $a_num and not $b_num ) {
+    } elsif ( $ai_is_num and not $bi_is_num ) {
       return -1
       # 11.4.3
-    } elsif ( not $a_num and $b_num ) {
+    } elsif ( not $ai_is_num and $bi_is_num ) {
       return 1
     } else {
       my $sign = $ai cmp $bi;
@@ -97,7 +99,6 @@ sub _compare_pre_release {
 }
 
 sub _croakf ( $@ ) {
-  # Load Carp lazily
   require Carp;
   @_ = ( ( @_ == 1 ? shift : sprintf shift, @_ ) . ', stopped' );
   goto &Carp::croak

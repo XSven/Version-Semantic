@@ -2,7 +2,30 @@
 
 =head1 NAME
 
-Version::Semantic - ...
+Version::Semantic - Tiny SemVer based class implementation
+
+=head1 SYNOPSIS
+
+  use Version::Semantic ();
+
+  my $v_unstable = Version::Semantic->parse( '1.0.0-alpha' );
+  my $v_testing  = Version::Semantic->parse( '1.0.0-beta' );
+  my $v_stable   = Version::Semantic->parse( '1.0.0' );
+
+  if ( $v_unstable < $v_testing and $v_testing < $v_stable ) {
+
+  }
+
+=head1 DESCRIPTION
+
+This class provides immutable version objects that support the L<Semantic
+Versioning Specification (SemVer)|https://semver.org/spec/v2.0.0.html>. It
+has a C<parse()> factory method. An object of that class has the
+attributes C<major>, C<minor>, C<patch>, C<pre_release>, and C<build>.
+The object method C<compare_to()> implements the L<precedence
+rules|https://semver.org/spec/v2.0.0.html#spec-item-11>. It is used to
+overload the numeric comparison C<E<lt>=E<gt>> operator. This allows you to
+compare version objects.
 
 =head1 SEE ALSO
 

@@ -34,7 +34,7 @@ subtest '11.3' => sub {
 };
 
 subtest '11.4' => sub {
-  plan tests => 17;
+  plan tests => 18;
 
   my @versions = qw(
     0.9.0
@@ -58,6 +58,7 @@ subtest '11.4' => sub {
     ok $class->parse( $versions[ $i ] ) < $class->parse( $versions[ $i + 1 ] ), "$versions[ $i ] < $versions[ $i + 1 ]"
   }
   ok $class->parse( '1.0.0-alpha.beta' ) > $class->parse( '1.0.0-alpha.1' ), '1.0.0-alpha.beta > 1.0.0-alpha.1';
+  ok $class->parse( '1.0.0-beta' ) > $class->parse( '1.0.0-alpha' ),         '1.0.0-beta > 1.0.0-alpha';
   ok $class->parse( '1.0.0-alpha' ) == $class->parse( '1.0.0-alpha' ),
     '1.0.0-alpha == 1.0.0-alpha (same pre-release lists)';
   ok $class->parse( '1.0.0-5' ) == $class->parse( '1.0.0-5' ), '1.0.0-5 == 1.0.0-5 (same pre-release lists)'
