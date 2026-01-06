@@ -35,6 +35,8 @@ sub patch       { shift->{ patch } }
 sub pre_release { shift->{ pre_release } }
 sub build       { shift->{ build } }
 
+sub is_released { not defined shift->pre_release }
+
 sub parse {
   my ( $class, $version ) = @_;
 

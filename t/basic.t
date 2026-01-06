@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 7;
+use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 8;
 use Test::Fatal qw( dies_ok exception lives_ok );
 my $class;
 
@@ -11,6 +11,8 @@ BEGIN {
 }
 
 like exception { $class->parse( '1.0.0-alpha_beta' ) }, qr/is not a semantic version/, 'Invalid semantic version';
+like exception { $class->parse( '1.0.0_01' ) }, qr/is not a semantic version/,
+  'Perl underscore syntax does not refer to a semantic version';
 
 subtest 'Invalid semantic version' => sub {
   plan tests => 39;
@@ -99,29 +101,31 @@ subtest 'Valid semantic versions' => sub {
 };
 
 subtest 'Test named capture group accessors' => sub {
-  plan tests => 6;
+  plan tests => 7;
 
   isa_ok my $self = $class->parse( '1.2.3-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay' ), $class;
   is $self->major,       1,                           'major';
   is $self->minor,       2,                           'minor';
   is $self->patch,       3,                           'patch';
   is $self->pre_release, 'alpha-a.b-c-somethinglong', 'pre_release';
-  is $self->build,       'build.1-aef.1-its-okay',    'build'
+  ok not( $self->is_released ), 'Is not a release';
+  is $self->build, 'build.1-aef.1-its-okay', 'build'
 };
 
 subtest 'Test named capture group accessors: "v" prefixed semantic version' => sub {
-  plan tests => 6;
+  plan tests => 7;
 
   isa_ok my $self = $class->parse( 'v0.0.4' ), $class;
   is $self->major, 0, 'major';
   is $self->minor, 0, 'minor';
   is $self->patch, 4, 'patch';
-  ok not( defined $self->pre_release ), 'pre_release is not defined'; ## no critic ( RequireTestLabels )
-  ok not( defined $self->build ), 'build is not defined' ## no critic ( RequireTestLabels )
+  ok not( defined $self->pre_release ), 'pre_release is not defined';
+  ok $self->is_released,                'Is a release';
+  ok not( defined $self->build ),       'build is not defined'
 };
 
 subtest 'Test named capture group accessors: "-TRIAL\d*" pre-releases' => sub {
-  plan tests => 20;
+  plan tests => 21;
 
   my $expected_pre_release = 'TRIAL';
   isa_ok my $self = $class->parse( "1.0.5-$expected_pre_release" ), $class;
@@ -129,7 +133,8 @@ subtest 'Test named capture group accessors: "-TRIAL\d*" pre-releases' => sub {
   is $self->minor,       0,                     'minor';
   is $self->patch,       5,                     'patch';
   is $self->pre_release, $expected_pre_release, "pre_release: $expected_pre_release";
-  ok not( defined $self->build ), 'build is not defined'; ## no critic ( RequireTestLabels )
+  ok not( $self->is_released ),   'Is not a release';
+  ok not( defined $self->build ), 'build is not defined';
 
   for ( 0 .. 13 ) {
     $expected_pre_release = "TRIAL$_";
