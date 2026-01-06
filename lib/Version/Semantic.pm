@@ -37,6 +37,11 @@ sub build       { shift->{ build } }
 
 sub is_released { not defined shift->pre_release }
 
+sub core {
+  my $self = shift;
+  join '.', map { $self->$_ } qw( major minor patch )
+}
+
 sub parse {
   my ( $class, $version ) = @_;
 
