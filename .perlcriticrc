@@ -16,10 +16,10 @@ verbose            = %f: %m at line %l, column %c.  (Policy: %p, Severity: %s)\n
 allow_name_regex = _(?:build|trigger)_\w+
 [-Subroutines::RequireArgUnpacking]
 [-Subroutines::RequireFinalReturn]
-# https://github.com/Perl-Critic/Perl-Critic/issues/1094
 [TestingAndDebugging::ProhibitNoWarnings]
 allow = once
-[TestingAndDebugging::RequireTestLabels]
+# https://github.com/Perl-Critic/Perl-Critic/issues/1094
+[-TestingAndDebugging::RequireTestLabels]
 [-ValuesAndExpressions::ProhibitCommaSeparatedStatements]
 [ValuesAndExpressions::ProhibitInterpolationOfLiterals]
 severity = 3
