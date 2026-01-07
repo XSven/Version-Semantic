@@ -63,17 +63,9 @@ sub compare_to {
   my ( $self, $other ) = @_;
 
   # 11.2
-  # String to v-string conversion
-  my $v_self = eval( 'v' . $self->version_core ); ## no critic ( ProhibitStringyEval )
-  my $v_other = eval( 'v' . $other->version_core ); ## no critic ( ProhibitStringyEval )
-  # v-strings have no numeric coercion; use byte-ordered string comparison
-  # instead
-  my $sign = $v_self cmp $v_other;
-  return $sign if $sign != 0;
-  # Former implementation
-  # for ( qw( major minor patch ) ) {
-  #   return $self->$_ <=> $other->$_ if $self->$_ != $other->$_
-  # }
+  for ( qw( major minor patch ) ) {
+    return $self->$_ <=> $other->$_ if $self->$_ != $other->$_
+  }
   $self->_compare_pre_release( $other )
 }
 
