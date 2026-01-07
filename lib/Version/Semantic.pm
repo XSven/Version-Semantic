@@ -19,7 +19,7 @@ sub _SEM_VER_REG_EX () {
   ## no critic ( ProhibitComplexRegexes )
   qr/
     \A
-    v?
+    (?<prefix> v )?
     (?<major> 0 | [1-9]\d* ) \. (?<minor> 0 | [1-9]\d* ) \.(?<patch> 0 | [1-9]\d* )
     (?: -  (?<pre_release> (?: 0 | [1-9]\d* | \d*[a-zA-Z-][0-9a-zA-Z-]* ) (?: \. (?: 0 | [1-9]\d* | \d*[a-zA-Z-][0-9a-zA-Z-]* ) )* ) )?
     (?: \+ (?<build> [0-9a-zA-Z-]+ (?: \. [0-9a-zA-Z-]+ )* ) )?
@@ -46,7 +46,7 @@ sub parse {
   $version =~ m/${ \( _SEM_VER_REG_EX ) }/x
     or _croakf "Version '%s' is not a semantic version", $version;
 
-  bless { %+, version_core => join( '.', map { $+{ $_ } } qw( major minor patch ) ) }, $class
+  bless { %+, version_core => ( $+{ prefix } // '' ) . join( '.', map { $+{ $_ } } qw( major minor patch ) ) }, $class
 }
 
 sub to_string {

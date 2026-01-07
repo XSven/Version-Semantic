@@ -133,13 +133,13 @@ subtest 'Test named capture group accessors: "v" prefixed semantic version' => s
   plan tests => 8;
 
   isa_ok my $self = $class->parse( 'v0.0.4' ), $class;
-  is $self->major,        0,       'major';
-  is $self->minor,        0,       'minor';
-  is $self->patch,        4,       'patch';
-  is $self->version_core, '0.0.4', 'version_core';
+  is $self->major,        0,        'major';
+  is $self->minor,        0,        'minor';
+  is $self->patch,        4,        'patch';
+  is $self->version_core, 'v0.0.4', 'version_core';
   ok not( $self->has_pre_release ), 'pre_release is not defined';
   ok not( $self->has_build ),       'build is not defined';
-  is "$self", '0.0.4', 'Stringification'
+  is "$self", 'v0.0.4', 'Stringification'
 };
 
 subtest 'Test named capture group accessors: "-TRIAL\d*" pre-releases' => sub {
