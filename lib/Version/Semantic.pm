@@ -64,8 +64,8 @@ sub compare_to {
 
   # 11.2
   # String to v-string conversion
-  my $v_self  = eval( 'v' . $self->version_core );
-  my $v_other = eval( 'v' . $other->version_core );
+  my $v_self = eval( 'v' . $self->version_core ); ## no critic ( ProhibitStringyEval )
+  my $v_other = eval( 'v' . $other->version_core ); ## no critic ( ProhibitStringyEval )
   # v-strings have no numeric coercion; use byte-ordered string comparison
   # instead
   my $sign = $v_self cmp $v_other;
