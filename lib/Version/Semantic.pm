@@ -1,5 +1,5 @@
 # Prefer numeric version for backwards compatibility
-BEGIN { require 5.010_001 }; ## no critic ( RequireUseStrict, RequireUseWarnings )
+BEGIN { require 5.010_000 }; ## no critic ( RequireUseStrict, RequireUseWarnings )
 use strict;
 use warnings;
 
@@ -7,7 +7,7 @@ package Version::Semantic;
 
 $Version::Semantic::VERSION = 'v1.0.0';
 
-use overload '<=>' => 'compare_to';
+use overload '""' => 'to_string', '<=>' => 'compare_to';
 
 sub _croakf ( $@ );
 
@@ -35,13 +35,15 @@ sub patch       { shift->{ patch } }
 sub pre_release { shift->{ pre_release } }
 sub build       { shift->{ build } }
 
-sub is_released { not defined shift->pre_release }
+sub has_pre_release { defined shift->{ pre_release } }
+sub has_build       { defined shift->{ build } }
 
-sub core {
+sub version_core {
   my $self = shift;
   join '.', map { $self->$_ } qw( major minor patch )
 }
 
+# Constructor as factory method
 sub parse {
   my ( $class, $version ) = @_;
 
@@ -49,6 +51,15 @@ sub parse {
     or _croakf "Version '%s' is not a semantic version", $version;
 
   bless { %+ }, $class
+}
+
+sub to_string {
+  my ( $self ) = @_;
+
+  my $string = $self->version_core;
+  $string .= '-' . $self->pre_release if $self->has_pre_release;
+  $string .= '+' . $self->build       if $self->has_build;
+  $string
 }
 
 # https://semver.org/spec/v2.0.0.html#spec-item-11
@@ -66,8 +77,8 @@ sub _compare_pre_release {
   my ( $self, $other ) = @_;
 
   # Split pre-release into list of dot separated identifiers
-  my @a = defined $self->pre_release  ? split /\./, $self->pre_release  : ();
-  my @b = defined $other->pre_release ? split /\./, $other->pre_release : ();
+  my @a = $self->has_pre_release  ? split /\./, $self->pre_release  : ();
+  my @b = $other->has_pre_release ? split /\./, $other->pre_release : ();
 
   # 11.3
   if ( @a ) {

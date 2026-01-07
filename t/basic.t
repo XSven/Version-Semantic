@@ -1,7 +1,7 @@
 use strict;
 use warnings;
 
-use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 8;
+use Test::More import => [ qw( BAIL_OUT is isa_ok like ok plan require_ok subtest ) ], tests => 9;
 use Test::Fatal qw( dies_ok exception lives_ok );
 my $class;
 
@@ -101,43 +101,60 @@ subtest 'Valid semantic versions' => sub {
 };
 
 subtest 'Test named capture group accessors' => sub {
-  plan tests => 8;
+  plan tests => 10;
 
   isa_ok my $self = $class->parse( '1.2.3-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay' ), $class;
-  is $self->major,       1,                           'major';
-  is $self->minor,       2,                           'minor';
-  is $self->patch,       3,                           'patch';
-  is $self->core,        '1.2.3',                     'core';
-  is $self->pre_release, 'alpha-a.b-c-somethinglong', 'pre_release';
-  ok not( $self->is_released ), 'Is not a release';
-  is $self->build, 'build.1-aef.1-its-okay', 'build'
+  is $self->major,        1,                           'major';
+  is $self->minor,        2,                           'minor';
+  is $self->patch,        3,                           'patch';
+  is $self->version_core, '1.2.3',                     'version_core';
+  is $self->pre_release,  'alpha-a.b-c-somethinglong', 'pre_release';
+  ok $self->has_pre_release, 'pre_release is defined';
+  is $self->build, 'build.1-aef.1-its-okay', 'build';
+  ok $self->has_build, 'build is defined';
+  is "$self", '1.2.3-alpha-a.b-c-somethinglong+build.1-aef.1-its-okay', 'Stringification'
+};
+
+subtest 'Test named capture group accessors: no pre-release but build information' => sub {
+  plan tests => 9;
+
+  isa_ok my $self = $class->parse( '2.0.0+build.1848' ), $class;
+  is $self->major,        2,       'major';
+  is $self->minor,        0,       'minor';
+  is $self->patch,        0,       'patch';
+  is $self->version_core, '2.0.0', 'version_core';
+  ok not( $self->has_pre_release ), 'pre_release is not defined';
+  is $self->build, 'build.1848', 'build';
+  ok $self->has_build, 'build is defined';
+  is "$self", '2.0.0+build.1848', 'Stringification'
 };
 
 subtest 'Test named capture group accessors: "v" prefixed semantic version' => sub {
   plan tests => 8;
 
   isa_ok my $self = $class->parse( 'v0.0.4' ), $class;
-  is $self->major, 0,       'major';
-  is $self->minor, 0,       'minor';
-  is $self->patch, 4,       'patch';
-  is $self->core,  '0.0.4', 'core';
-  ok not( defined $self->pre_release ), 'pre_release is not defined';
-  ok $self->is_released,                'Is a release';
-  ok not( defined $self->build ),       'build is not defined'
+  is $self->major,        0,       'major';
+  is $self->minor,        0,       'minor';
+  is $self->patch,        4,       'patch';
+  is $self->version_core, '0.0.4', 'version_core';
+  ok not( $self->has_pre_release ), 'pre_release is not defined';
+  ok not( $self->has_build ),       'build is not defined';
+  is "$self", '0.0.4', 'Stringification'
 };
 
 subtest 'Test named capture group accessors: "-TRIAL\d*" pre-releases' => sub {
-  plan tests => 22;
+  plan tests => 23;
 
   my $expected_pre_release = 'TRIAL';
   isa_ok my $self = $class->parse( "1.0.5-$expected_pre_release" ), $class;
-  is $self->major,       1,                     'major';
-  is $self->minor,       0,                     'minor';
-  is $self->patch,       5,                     'patch';
-  is $self->core,        '1.0.5',               'core';
-  is $self->pre_release, $expected_pre_release, "pre_release: $expected_pre_release";
-  ok not( $self->is_released ),   'Is not a release';
-  ok not( defined $self->build ), 'build is not defined';
+  is $self->major,        1,                     'major';
+  is $self->minor,        0,                     'minor';
+  is $self->patch,        5,                     'patch';
+  is $self->version_core, '1.0.5',               'version_core';
+  is $self->pre_release,  $expected_pre_release, "pre_release: $expected_pre_release";
+  ok $self->has_pre_release,  'pre_release is defined';
+  ok not( $self->has_build ), 'build is not defined';
+  is "$self", "1.0.5-$expected_pre_release", 'Stringification';
 
   for ( 0 .. 13 ) {
     $expected_pre_release = "TRIAL$_";
