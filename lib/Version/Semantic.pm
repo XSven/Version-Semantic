@@ -29,19 +29,15 @@ sub _SEM_VER_REG_EX () {
 
 # Use BNF terminology
 # https://semver.org/spec/v2.0.0.html#backusnaur-form-grammar-for-valid-semver-versions
-sub major       { shift->{ major } }
-sub minor       { shift->{ minor } }
-sub patch       { shift->{ patch } }
-sub pre_release { shift->{ pre_release } }
-sub build       { shift->{ build } }
+sub major        { shift->{ major } }
+sub minor        { shift->{ minor } }
+sub patch        { shift->{ patch } }
+sub version_core { shift->{ version_core } }
+sub pre_release  { shift->{ pre_release } }
+sub build        { shift->{ build } }
 
 sub has_pre_release { defined shift->{ pre_release } }
 sub has_build       { defined shift->{ build } }
-
-sub version_core {
-  my $self = shift;
-  join '.', map { $self->$_ } qw( major minor patch )
-}
 
 # Constructor as factory method
 sub parse {
@@ -50,7 +46,7 @@ sub parse {
   $version =~ m/${ \( _SEM_VER_REG_EX ) }/x
     or _croakf "Version '%s' is not a semantic version", $version;
 
-  bless { %+ }, $class
+  bless { %+, version_core => join( '.', map { $+{ $_ } } qw( major minor patch ) ) }, $class
 }
 
 sub to_string {
@@ -67,9 +63,17 @@ sub compare_to {
   my ( $self, $other ) = @_;
 
   # 11.2
-  for ( qw( major minor patch ) ) {
-    return $self->$_ <=> $other->$_ if $self->$_ != $other->$_
-  }
+  # String to v-string conversion
+  my $v_self  = eval( 'v' . $self->version_core );
+  my $v_other = eval( 'v' . $other->version_core );
+  # v-strings have no numeric coercion; use byte-ordered string comparison
+  # instead
+  my $sign = $v_self cmp $v_other;
+  return $sign if $sign != 0;
+  # Former implementation
+  # for ( qw( major minor patch ) ) {
+  #   return $self->$_ <=> $other->$_ if $self->$_ != $other->$_
+  # }
   $self->_compare_pre_release( $other )
 }
 
