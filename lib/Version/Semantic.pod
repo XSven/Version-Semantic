@@ -21,22 +21,22 @@ Version::Semantic - Tiny SemVer based class implementation
 This class defines immutable version objects that support the L<Semantic
 Versioning Specification (SemVer)|https://semver.org/spec/v2.0.0.html>.
 
-The class has a C<parse()> factory method to create objects from their string
-representation. The method accepts semantic version strings that have a
-C<v> prefix.
+The class has a C<parse( $version )> factory method (a class method)
+to create objects from their semantic version strings. The method accepts
+semantic version strings that have a C<v> prefix.
 
 Each object has the mandatory attributes C<major>, C<minor>,
 and C<patch>.  Optional object attributes are C<pre_release> and
 C<build>. C<has_pre_release()> and C<has_build_()> predicate methods exist too.
 
 The C<version_core()> object method returns the semantic version string of
-an object without the C<v> prefix and pre-release and build extensions.
+an object without the C<v> prefix and without pre-release and build extensions.
 
 The C<to_string()> object method returns the semantic version string of an
 object without the C<v> prefix. It is used to overload the stringification
 C<""> operator.
 
-The C<compare_to()> object method implements the L<precedence
+The C<compare_to()> object method implements the L<SemVer precedence
 rules|https://semver.org/spec/v2.0.0.html#spec-item-11>. It is used to
 overload the numeric comparison C<E<lt>=E<gt>> operator. This allows you to
 compare version objects.
@@ -65,7 +65,7 @@ Sven Willenbuecher <sven.willenbuecher@gmx.de>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2025 by Sven Willenbuecher.
+This software is copyright (c) 2026 by Sven Willenbuecher.
 
 This is free software; you can redistribute it and/or modify it under the
 same terms as the Perl 5 programming language system itself.
