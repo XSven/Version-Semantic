@@ -11,10 +11,8 @@ use overload '""' => 'to_string', '<=>' => 'compare_to';
 
 sub _croakf ( $@ );
 
-# - Allow optional "v" prefix
-#   https://semver.org/spec/v2.0.0.html#is-v123-a-semantic-version
-# - On purpose use "build" (the BNF symbol name) instead of "buildmetadata" as
-#   the name of the last named capture group
+# On purpose use "build" (the BNF symbol name) instead of "buildmetadata" as
+# the name of the last named capture group
 sub _SEM_VER_REG_EX () {
   ## no critic ( ProhibitComplexRegexes )
   qr/
