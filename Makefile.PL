@@ -5,7 +5,7 @@ use ExtUtils::MM          ();
 use File::Spec::Functions qw( catfile );
 
 my @main_module_namespace = qw( Version Semantic );
-my $release_status        = 'testing';                # Transitions: unstable => testing => stable
+my $release_status        = 'stable';                # Transitions: unstable => testing => stable
 my $pre_release_number    = 1;
 
 my $distname            = join '-',  @main_module_namespace;
